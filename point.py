@@ -54,7 +54,7 @@ if 'points' not in st.session_state:
     st.session_state.points = data.get("points", 0)
 
 # 3. メインの表示（ここで関数を呼び出す）
-st.title("家庭教師ポイント管理")
+st.title("Stamp Card for YURI")
 st.metric(label="現在のスタンプ数", value=f"{st.session_state.points} 個")
 
 # ここで呼び出し
