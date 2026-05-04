@@ -30,6 +30,52 @@ st.title("家庭教師ポイント管理")
 # 現在のポイント表示
 st.metric(label="現在のスタンプ数", value=f"{st.session_state.points} 個")
 
+# --- 既存のコード ---
+st.title("家庭教師ポイント管理")
+st.metric(label="現在のスタンプ数", value=f"{st.session_state.points} 個")
+
+# --- 追加するスタンプカード表示 ---
+display_stamp_card(st.session_state.points)
+
+st.divider()
+# --- 以下、サイドバーなどの既存処理 ---
+
+def display_stamp_card(points, max_stamps=20):
+    """
+    ポイントをスタンプカード形式で表示する
+    """
+    st.subheader("スタンプカード")
+    
+    # 5列のグリッドを作成
+    cols_per_row = 5
+    rows = (max_stamps // cols_per_row)
+    
+    # カードの外枠を模したコンテナ
+    with st.container(border=True):
+        for r in range(rows):
+            cols = st.columns(cols_per_row)
+            for c in range(cols_per_row):
+                current_idx = r * cols_per_row + c + 1
+                with cols[c]:
+                    if current_idx <= points:
+                        # スタンプが押されている状態
+                        st.markdown(
+                            f"<div style='text-align: center; font-size: 30px; "
+                            f"background-color: #FFEB3B; border-radius: 50%; "
+                            f"width: 50px; height: 50px; line-height: 50px; margin: auto;'>"
+                            f"💮</div>", 
+                            unsafe_allow_html=True
+                        )
+                    else:
+                        # 空枠の状態
+                        st.markdown(
+                            f"<div style='text-align: center; font-size: 20px; color: #E0E0E0; "
+                            f"border: 2px dashed #E0E0E0; border-radius: 50%; "
+                            f"width: 50px; height: 50px; line-height: 50px; margin: auto;'>"
+                            f"{current_idx}</div>", 
+                            unsafe_allow_html=True
+                        )
+
 st.divider()
 
 # サイドバーに管理用メニューを作成
