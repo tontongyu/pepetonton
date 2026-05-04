@@ -4,7 +4,7 @@ import os
 
 # 1. 基本設定やデータ読み込みの関数
 SAVE_FILE = "points_data.json"
-TEACHER_PASSWORD = "mayu0907"
+TEACHER_PASSWORD = st.secrets["general"]["password"]
 
 def load_data():
     if os.path.exists(SAVE_FILE):
