@@ -2,9 +2,8 @@ import streamlit as st
 import json
 import os
 
-# 保存先のファイル名
+# 1. 基本設定やデータ読み込みの関数
 SAVE_FILE = "points_data.json"
-# 先生用のパスワード（ここを自由に変更してください）
 TEACHER_PASSWORD = "mayu0907"
 
 def load_data():
@@ -20,37 +19,12 @@ def save_data(data):
     with open(SAVE_FILE, "w") as f:
         json.dump(data, f)
 
-# データの初期化
-if 'points' not in st.session_state:
-    data = load_data()
-    st.session_state.points = data.get("points", 0)
-
-st.title("家庭教師ポイント管理")
-
-# 現在のポイント表示
-st.metric(label="現在のスタンプ数", value=f"{st.session_state.points} 個")
-
-# --- 既存のコード ---
-st.title("家庭教師ポイント管理")
-st.metric(label="現在のスタンプ数", value=f"{st.session_state.points} 個")
-
-# --- 追加するスタンプカード表示 ---
-display_stamp_card(st.session_state.points)
-
-st.divider()
-# --- 以下、サイドバーなどの既存処理 ---
-
+# ★重要★ 呼び出す前に「display_stamp_card」を定義します
 def display_stamp_card(points, max_stamps=20):
-    """
-    ポイントをスタンプカード形式で表示する
-    """
     st.subheader("スタンプカード")
-    
-    # 5列のグリッドを作成
     cols_per_row = 5
     rows = (max_stamps // cols_per_row)
     
-    # カードの外枠を模したコンテナ
     with st.container(border=True):
         for r in range(rows):
             cols = st.columns(cols_per_row)
@@ -58,7 +32,6 @@ def display_stamp_card(points, max_stamps=20):
                 current_idx = r * cols_per_row + c + 1
                 with cols[c]:
                     if current_idx <= points:
-                        # スタンプが押されている状態
                         st.markdown(
                             f"<div style='text-align: center; font-size: 30px; "
                             f"background-color: #FFEB3B; border-radius: 50%; "
@@ -67,7 +40,6 @@ def display_stamp_card(points, max_stamps=20):
                             unsafe_allow_html=True
                         )
                     else:
-                        # 空枠の状態
                         st.markdown(
                             f"<div style='text-align: center; font-size: 20px; color: #E0E0E0; "
                             f"border: 2px dashed #E0E0E0; border-radius: 50%; "
@@ -76,29 +48,35 @@ def display_stamp_card(points, max_stamps=20):
                             unsafe_allow_html=True
                         )
 
+# 2. データの初期化
+if 'points' not in st.session_state:
+    data = load_data()
+    st.session_state.points = data.get("points", 0)
+
+# 3. メインの表示（ここで関数を呼び出す）
+st.title("家庭教師ポイント管理")
+st.metric(label="現在のスタンプ数", value=f"{st.session_state.points} 個")
+
+# ここで呼び出し
+display_stamp_card(st.session_state.points)
+
 st.divider()
 
-# サイドバーに管理用メニューを作成
+# 4. サイドバーと管理操作（先生モードなど）
 st.sidebar.header("メニュー")
 mode = st.sidebar.radio("モード切替", ["生徒モード", "先生モード"])
 
+# （以下、以前のコードと同様）
 if mode == "先生モード":
-    # 修正ポイント：パスワード入力
-    password = st.sidebar.text_input("先生用パスワードを入力し、Enterで確定", type="password")
-    
+    password = st.sidebar.text_input("先生用パスワードを入力", type="password")
     if password == TEACHER_PASSWORD:
         st.sidebar.success("認証されました")
-        
-        st.subheader("【先生用操作パネル】")
-        # 確実にボタンが表示されるよう、メインエリアに配置
         num_to_add = st.number_input("付与するポイント数", min_value=1, value=1, step=1)
-        
         if st.button(f"{num_to_add} ポイント付与する"):
             st.session_state.points += num_to_add
             save_data({"points": st.session_state.points})
-            st.success(f"{num_to_add} ポイント付与しました。")
-            # 5秒後に自動でメッセージを消す代わりに、再描画して数値を更新
             st.rerun()
+    # ...（中略）...
             
         if st.sidebar.button("ポイントをリセット"):
             st.session_state.points = 0
